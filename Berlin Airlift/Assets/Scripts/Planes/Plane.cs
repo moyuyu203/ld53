@@ -34,7 +34,7 @@ public abstract class Plane : MonoBehaviour
 
     public Action<PlaneState> OnChangeState;
     public PlaneGroup Group { get { return m_group; } }
-
+    public PlaneState State { get { return m_state; } }
     protected virtual void FixedUpdate()
     {
        // Debug.Log(m_state);
@@ -52,15 +52,23 @@ public abstract class Plane : MonoBehaviour
     }
     public virtual void TakeOff()
     {
-
+        this.gameObject.SetActive(true);
         if (m_state == PlaneState.Ready)
         {
-
-            Debug.Log("Executate take off");
+            Debug.Log("Plane take off");
             m_state = PlaneState.OnTask;
             OnChangeState?.Invoke(m_state);
         }
         
+    }
+    public virtual void Land()
+    {
+        Debug.Log("Plane landed");
+        m_state = PlaneState.Grounded;
+        m_heading = Vector3.right;
+        m_distanceTraveled = 0;
+        OnChangeState?.Invoke(m_state);
+        this.gameObject.SetActive(false);
     }
 
     
