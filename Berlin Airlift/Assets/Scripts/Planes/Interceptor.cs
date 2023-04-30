@@ -4,41 +4,33 @@ using UnityEngine;
 
 public class Interceptor : Plane
 {
-    public float Range;
-    public float Speed;
-
-    public Transform Target;
+    private Transform m_target;
     private InterceptorBase m_homeBase;
-    private SpriteRenderer m_spriteRenderer;
-    private void Awake()
+    
+    public Transform Target
     {
-        m_state = PlaneState.Ready;
-        m_range = Range;
-        m_speed = Speed;
-        m_heading = Vector3.right;
+        get { return m_target; }
+        set { m_target = value; }
+    }
+    protected override void Awake()
+    {
+        base.Awake();
         m_group = PlaneGroup.WarsawPact;
-        m_spriteRenderer = GetComponent<SpriteRenderer>();
-        m_spriteRenderer.color = Color.red;
-        //TakeOff();
     }
 
     public void SetHomeBase(InterceptorBase airbase)
     {
         m_homeBase = airbase;
     }
+    
     protected override void FixedUpdate()
     {
-        if (m_state == PlaneState.OnTask)
-        {
-            base.FixedUpdate();
-            m_heading = (Target.position - transform.position).normalized;
-        }
-        else if(m_state == PlaneState.RTB)
-        {
-            transform.position += m_heading * m_speed * Time.deltaTime;
-            m_distanceTraveled += m_speed * Time.deltaTime;
-            m_heading = (m_homeBase.transform.position - transform.position).normalized;
-        }
+        base.FixedUpdate();
+        if (State == PlaneState.OnTask && m_target)
+            Heading = m_target.position - transform.position;
+        else if (State == PlaneState.RTB && m_homeBase)
+            Heading = m_homeBase.transform.position - transform.position;
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -48,14 +40,13 @@ public class Interceptor : Plane
         {
             if(otherPlane.Group == PlaneGroup.Nato)
             {
-                m_state = PlaneState.RTB;
-                OnChangeState?.Invoke(m_state);
+                State = PlaneState.RTB;
                 Debug.Log("Interception mission completed, return to base");
             }
         }
 
         InterceptorBase airbase =  collision.GetComponent<InterceptorBase>();
-        if (airbase && m_state == PlaneState.RTB)
+        if (airbase && State == PlaneState.RTB)
         {
             if(airbase.gameObject.GetInstanceID() == m_homeBase.gameObject.GetInstanceID())
             {

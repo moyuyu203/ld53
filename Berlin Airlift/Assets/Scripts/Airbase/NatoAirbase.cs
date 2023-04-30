@@ -3,40 +3,54 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public struct TimeSlot
+
+public class NatoAirbase : Waypoint, IMouseInput
 {
-    public int timeSlot;
-    public GameObject plane;
-}
-public class NatoAirbase : Waypoint
-{
-    [SerializeField] private List<TimeSlot> TakeOffTimeTable = new List<TimeSlot>();
+    [SerializeField] private List<Transport> TakeOffTimeTable = new List<Transport>();
 
 
     private void Start()
     {
-        GlobalTimer.Instance.OnChangeTimetable += OrderTakeOff;
-        ProcessTakeOffOrder();
     }
 
-    private void ProcessTakeOffOrder()
-    {
-        for(int i = 0; i < TakeOffTimeTable.Count; i++)
-        {
-            TimeSlot slot = TakeOffTimeTable[i];
-            slot.timeSlot = i;
-            if(slot.plane)
-                slot.plane = Instantiate(slot.plane, transform.position, Quaternion.identity);
 
-            TakeOffTimeTable[i] = slot;
+    private void Update()
+    {
+        if(TakeOffTimeTable.Count > 0)
+        {
+            TakeOffTimeTable[0].StartPreparation();
+            if (TakeOffTimeTable[0].State == PlaneState.Ready)
+            {
+                TakeOffTimeTable[0].TakeOff();
+                TakeOffTimeTable.RemoveAt(0);
+            }
         }
     }
-    protected void OrderTakeOff(int timeSlot)
+
+
+
+    public void MouseHover()
     {
-        if(timeSlot < TakeOffTimeTable.Count && TakeOffTimeTable[timeSlot].plane != null)
+        //Debug.Log("Mouse is hover");
+
+    }
+    public void MouseClick()
+    {
+        Debug.Log("Mouse click");
+        TryDeployment();
+    }
+
+    private void TryDeployment()
+    {
+        
+        Transport plane = USAFCommand.Instance.RequestDeployment();
+        
+        if (plane)
         {
-            TakeOffTimeTable[timeSlot].plane.GetComponent<Plane>().TakeOff();
+            //plane.TakeOff();
+            plane.transform.position = transform.position;
+            TakeOffTimeTable.Add(plane);
+           
         }
     }
 }

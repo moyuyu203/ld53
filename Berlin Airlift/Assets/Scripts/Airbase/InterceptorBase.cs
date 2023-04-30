@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class InterceptorBase : MonoBehaviour
@@ -15,7 +16,10 @@ public class InterceptorBase : MonoBehaviour
         {
             Interceptor instance = Instantiate(interceptorPrefab, transform.position, Quaternion.identity);
             instance.SetHomeBase(this);
-            instance.gameObject.SetActive(false);
+            //instance.InstanceInit();
+            instance.StartPreparation();
+            //instance.gameObject.SetActive(false);
+            
             m_interceptors.Add(instance);
         }
         m_baseRadar = GetComponentInChildren<Radar>();
@@ -53,8 +57,8 @@ public class InterceptorBase : MonoBehaviour
             foreach(Interceptor onTaskPlane in onTaskPlanes)
             {
                 Transform trackingTarget = onTaskPlane.Target;
-                Debug.Log(trackingTarget.GetInstanceID());
-                Debug.Log(target.GetInstanceID());
+                //Debug.Log(trackingTarget.GetInstanceID());
+                //Debug.Log(target.GetInstanceID());
 
                 if(GameObject.ReferenceEquals(trackingTarget.gameObject , target.gameObject))
                 {

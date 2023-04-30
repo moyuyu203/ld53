@@ -2,31 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DummyPlane : Plane
+public class Transport : Plane
 {
+    [SerializeField] private float m_payload;
+   
     protected override void Awake()
     {
         base.Awake();
         m_group = PlaneGroup.Nato;
-        TakeOff();
     }
-    
+
+    protected override void FixedUpdate()
+    {
+        base.FixedUpdate();
+        Heading = (Berlin.Instance.transform.position - transform.position).normalized;
+    }
+
     public override void TakeOff()
     {
-     
-        base.TakeOff();
-        Debug.Log("Dummy plane takes off");
-    }
-    
 
-    private void HandleChangeState(PlaneState state)
-    {
-        switch (state)
-        {
-            case PlaneState.Destroyed:
-                Debug.Log("Destroy! ");
-                break;
-        }
+        base.TakeOff();
+        Debug.Log("Transport plane takes off");
     }
 
     protected void OnTriggerEnter2D(Collider2D collision)
@@ -38,6 +34,11 @@ public class DummyPlane : Plane
             {
                 PlaneShotDown();
             }
+        }
+        Berlin berlinAirField = collision.gameObject.GetComponent<Berlin>();
+        if (berlinAirField)
+        {
+            berlinAirField.SupplyBerlin(m_payload);
         }
     }
 }
