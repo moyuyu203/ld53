@@ -3,15 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
 
 public class NatoAirbase : Waypoint, IMouseInput
 {
+  
     [SerializeField] private List<Transport> TakeOffTimeTable = new List<Transport>();
-
-
-    private void Start()
-    {
-    }
 
 
     private void Update()
@@ -43,7 +40,7 @@ public class NatoAirbase : Waypoint, IMouseInput
     private void TryDeployment()
     {
         
-        Transport plane = USAFCommand.Instance.RequestDeployment();
+        Plane plane = USAFCommand.Instance.RequestDeployment();
         
         if (plane)
         {
@@ -53,4 +50,7 @@ public class NatoAirbase : Waypoint, IMouseInput
            
         }
     }
+    
 }
+
+*/

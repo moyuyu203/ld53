@@ -4,25 +4,12 @@ using UnityEngine;
 
 public class Interceptor : Plane
 {
-    private Transform m_target;
-    private InterceptorBase m_homeBase;
-    
-    public Transform Target
-    {
-        get { return m_target; }
-        set { m_target = value; }
-    }
     protected override void Awake()
     {
         base.Awake();
         m_group = PlaneGroup.WarsawPact;
     }
 
-    public void SetHomeBase(InterceptorBase airbase)
-    {
-        m_homeBase = airbase;
-    }
-    
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
@@ -30,15 +17,28 @@ public class Interceptor : Plane
             Heading = m_target.position - transform.position;
         else if (State == PlaneState.RTB && m_homeBase)
             Heading = m_homeBase.transform.position - transform.position;
-
+        if (Target)
+        {
+            Plane targetPlane = Target.gameObject.GetComponent<Plane>();
+            if (targetPlane && State == PlaneState.OnTask && targetPlane.State == PlaneState.Destroyed || targetPlane.State == PlaneState.Grounded || targetPlane.State == PlaneState.Ready)
+            {
+                //Target lost, rtb
+                Target = null;
+                State = PlaneState.RTB;
+            }
+        }
     }
-
+    public override void Land()
+    {
+        base.Land();
+        m_homeBase.LineUp(this);
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Plane otherPlane = collision.GetComponent<Plane>();
         if (otherPlane)
         {
-            if(otherPlane.Group == PlaneGroup.Nato)
+            if(otherPlane.Group == PlaneGroup.Nato && (otherPlane.State == PlaneState.OnTask || otherPlane.State == PlaneState.RTB))
             {
                 State = PlaneState.RTB;
                 Debug.Log("Interception mission completed, return to base");
@@ -50,6 +50,7 @@ public class Interceptor : Plane
         {
             if(airbase.gameObject.GetInstanceID() == m_homeBase.gameObject.GetInstanceID())
             {
+                Debug.Log("Do interceptor landing");
                 Land();
             }
         }

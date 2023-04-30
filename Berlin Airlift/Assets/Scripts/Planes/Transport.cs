@@ -22,6 +22,7 @@ public class Transport : Plane
     {
 
         base.TakeOff();
+        
         Debug.Log("Transport plane takes off");
     }
 
@@ -39,6 +40,7 @@ public class Transport : Plane
         if (berlinAirField)
         {
             berlinAirField.SupplyBerlin(m_payload);
+            Land();
         }
     }
 }

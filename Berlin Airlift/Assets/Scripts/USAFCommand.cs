@@ -4,16 +4,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public struct PlaneCount
+public struct TransportCount
 {
-    public Transport transport;
+    public Transport plane;
     public int count;
 }
 
 public class USAFCommand : Singleton<USAFCommand>
 {
     
-    public List<PlaneCount> TransportInventory = new List<PlaneCount>();
+    public List<TransportCount> TransportInventory = new List<TransportCount>();
     private int m_planeIndex;
 
     public void SelectDeployment(int planeIndex)
@@ -26,12 +26,12 @@ public class USAFCommand : Singleton<USAFCommand>
     {
         if (TransportInventory[m_planeIndex].count > 0)
         {
-            PlaneCount newPlaneCount = TransportInventory[m_planeIndex];
+            TransportCount newPlaneCount = TransportInventory[m_planeIndex];
             newPlaneCount.count--;
             TransportInventory[m_planeIndex] = newPlaneCount;
-            Transport instance = Instantiate(newPlaneCount.transport, Vector3.zero, Quaternion.identity);
+            Transport instance = Instantiate(newPlaneCount.plane, Vector3.zero, Quaternion.identity);
             
-            Debug.Log(instance);
+            //Debug.Log(instance);
             return instance;
 
         }

@@ -1,76 +1,89 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class InterceptorBase : MonoBehaviour
+[Serializable]
+public struct InterceptorCount
 {
-    public List<Interceptor> InterceptorPrefabs = new List<Interceptor>();
+    public Interceptor plane;
+    public int count;
+}
+public class InterceptorBase : Airbase
+{
+    //public List<Interceptor> InterceptorPrefabs = new List<Interceptor>();
 
-    private List<Interceptor> m_interceptors = new List<Interceptor>();
-    private Radar m_baseRadar;
+    //private List<Interceptor> m_interceptors = new List<Interceptor>();
+
+    //private Radar m_baseRadar;
+    public List<InterceptorCount> PlaneInventory = new List<InterceptorCount>();
+
+    public List<Radar> RadarStations = new List<Radar>();
+
+    private List<Transform> m_trackingTargets = new List<Transform>();
 
     private void Awake()
     {
-        foreach(var interceptorPrefab in InterceptorPrefabs)
+        foreach(InterceptorCount pCount in PlaneInventory)
         {
-            Interceptor instance = Instantiate(interceptorPrefab, transform.position, Quaternion.identity);
-            instance.SetHomeBase(this);
-            //instance.InstanceInit();
-            instance.StartPreparation();
-            //instance.gameObject.SetActive(false);
-            
-            m_interceptors.Add(instance);
+            for (int i = 0; i < pCount.count; i++)
+            {
+                Plane interceptor = Instantiate(pCount.plane);
+                interceptor.SetHomeBase(this);
+                LineUp(interceptor);
+            }
         }
-        m_baseRadar = GetComponentInChildren<Radar>();
+        Radar baseRadar = GetComponent<Radar>();
+        RadarStations.Add(baseRadar);
     }
 
     private void Start()
     {
-        m_baseRadar.OnFoundTargets += HandleRadarDetection;
+        //m_baseRadar.OnFoundTargets += HandleRadarDetection;
+        foreach(Radar radar in RadarStations)
+        {
+            radar.OnFoundTargets += HandleRadarDetection;
+        }
     }
 
-    private void HandleRadarDetection()
+    protected override void Update()
     {
-        List<Interceptor> missionReadyPlanes = new List<Interceptor>();
-        List<Interceptor> onTaskPlanes = new List<Interceptor>();
-        foreach(Interceptor plane in m_interceptors)
+        base.Update();
+        for(int i = 0; i < m_trackingTargets.Count; i++)
         {
-            if(plane.State == PlaneState.Ready)
+            Plane targetPlane = m_trackingTargets[i].gameObject.GetComponent<Plane>();
+            if(targetPlane && targetPlane.State == PlaneState.Destroyed)
             {
-                missionReadyPlanes.Add(plane);
-            }
-            if(plane.State == PlaneState.OnTask)
-            {
-                onTaskPlanes.Add(plane);
+                m_trackingTargets.RemoveAt(i);  
             }
         }
-
-        if(missionReadyPlanes.Count == 0)
-        {
-            return;
-        }
+    }
+    private void HandleRadarDetection(List<Transform> targets)
+    {
+       
         bool isNewTarget;
-        foreach(Transform target in m_baseRadar.Targets)
+        foreach(Transform target in targets)
         {
             isNewTarget = true;
-            foreach(Interceptor onTaskPlane in onTaskPlanes)
+            foreach(Transform trackingTarget in m_trackingTargets)
             {
-                Transform trackingTarget = onTaskPlane.Target;
-                //Debug.Log(trackingTarget.GetInstanceID());
-                //Debug.Log(target.GetInstanceID());
-
+                
                 if(GameObject.ReferenceEquals(trackingTarget.gameObject , target.gameObject))
                 {
                     isNewTarget = false;
                 }
             }
-            if (isNewTarget && missionReadyPlanes.Count > 0)
+            if (isNewTarget && m_takeoffQueue.Count > 0 && RunwayClear)
             {
-                missionReadyPlanes[0].Target = target;
-                missionReadyPlanes[0].TakeOff();
+                //missionReadyPlanes[0].Target = target;
+                //missionReadyPlanes[0].TakeOff();
 
-                missionReadyPlanes.RemoveAt(0);
+                //missionReadyPlanes.RemoveAt(0);
+
+                m_takeoffQueue[0].Target = target;
+                m_trackingTargets.Add(target);
+                OrderTakeoff();
             }
 
 
@@ -79,5 +92,7 @@ public class InterceptorBase : MonoBehaviour
         }
 
     }
+
+   
 
 }

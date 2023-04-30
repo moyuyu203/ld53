@@ -11,9 +11,9 @@ public class Radar : MonoBehaviour
     [SerializeField] float m_detectionRadius = 3.0f;
 
     private float m_lastScanTimeStamp;
-    private List<Transform> m_targets = new List<Transform>();
-    public Action OnFoundTargets;
-    public List<Transform> Targets { get { return m_targets; } }
+    //private List<Transform> m_targets = new List<Transform>();
+    public Action<List<Transform>> OnFoundTargets;
+    //public List<Transform> Targets { get { return m_targets; } }
     
     private void Awake()
     {
@@ -32,21 +32,21 @@ public class Radar : MonoBehaviour
     private void Scan()
     {
         
-        m_targets.Clear();
+        List<Transform> targets = new List<Transform>();    
         Collider2D[] unknownObjects = Physics2D.OverlapCircleAll(transform.position, m_detectionRadius);
         foreach(Collider2D unknownObject in unknownObjects)
         {
             Plane plane = unknownObject.gameObject.GetComponent<Plane>();
             if (plane && plane.Group == PlaneGroup.Nato && plane.State != PlaneState.Destroyed)
             {
-                m_targets.Add(unknownObject.gameObject.transform);
+                targets.Add(unknownObject.gameObject.transform);
                 
             }
         }
 
-        if (m_targets.Count > 0)
+        if (targets.Count > 0)
         {
-            OnFoundTargets?.Invoke();
+            OnFoundTargets?.Invoke(targets);
         }
 
     }
