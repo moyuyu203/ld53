@@ -235,6 +235,10 @@ public abstract class Plane : MonoBehaviour
         }
         m_state = PlaneState.Destroyed;
         m_spriteRenderer.color = Color.gray;
+        if(m_group == PlaneGroup.Nato)
+        {
+            USAFCommand.Instance.TotalLostPlanes++;
+        }
     }
 
     public void StartPreparation()

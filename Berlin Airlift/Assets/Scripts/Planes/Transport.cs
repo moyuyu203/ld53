@@ -35,7 +35,7 @@ public class Transport : Plane
         Plane otherPlane = collision.gameObject.GetComponent<Plane>();
         if (otherPlane)
         {
-            if (otherPlane.Group == PlaneGroup.WarsawPact && this.m_group == PlaneGroup.Nato)
+            if (otherPlane.Group == PlaneGroup.WarsawPact && this.m_group == PlaneGroup.Nato && State != PlaneState.Destroyed)
             {
                 PlaneShotDown();
             }
