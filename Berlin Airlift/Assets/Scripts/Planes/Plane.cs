@@ -40,7 +40,7 @@ public abstract class Plane : MonoBehaviour
 
     protected Transform m_target;
 
-
+    private LineRenderer m_lineRenderer;
     public Transform Target
     {
         get { return m_target; }
@@ -52,8 +52,17 @@ public abstract class Plane : MonoBehaviour
     public PlaneState State { get { return m_state; } protected set { m_state = value; } }
     public float Speed { get { return m_speed; } }
 
-    public Vector3 Heading { get { return m_heading; } set { m_heading = value.normalized; } }
+    public Vector3 Heading { 
+        get { 
+            return m_heading; 
+        } 
+        set { 
+            Vector3 v = new Vector3(value.x, value.y, 0);
+            m_heading = v.normalized;
+        } }
     public float TakeoffRollRatio { get { return 1 - m_remainPrepTime / m_preparationTime; } }
+
+    public float RemainFuel { get { return 1 - m_distanceTraveled / m_range; } }
     protected virtual void Awake()
     {
         InstanceInit();
@@ -67,6 +76,18 @@ public abstract class Plane : MonoBehaviour
         m_state = PlaneState.Grounded;
         //Debug.Log(m_remainPrepTime);
         m_rb = GetComponent<Rigidbody2D>();
+
+        m_lineRenderer = GetComponent<LineRenderer>();
+        if (m_lineRenderer)
+        {
+            m_lineRenderer.startWidth = 0.03f;
+            m_lineRenderer.endWidth = 0.03f;
+            m_lineRenderer.startColor = UnityEngine.Color.yellow;
+            m_lineRenderer.endColor = UnityEngine.Color.yellow;
+            m_lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            m_lineRenderer.enabled = false;
+            m_lineRenderer.sortingLayerName = "Middle";
+        }
     }
 
     protected virtual void Start()
@@ -103,18 +124,78 @@ public abstract class Plane : MonoBehaviour
                 m_state = PlaneState.Ready;
             }
         }
+
+        //Handle Movement
+        if(m_state == PlaneState.RTB)
+        {
+            if(m_lineRenderer)
+                m_lineRenderer.enabled = false;
+
+            Heading = (m_homeBase.transform.position - transform.position).normalized;
+            Vector3 toPosition = transform.position + Heading * Speed * Time.deltaTime;
+            m_distanceTraveled += m_speed * Time.deltaTime;
+            MovePlane(toPosition);
+        }
+        else if(m_state == PlaneState.OnTask)
+        {
+            if (Target)
+            {
+                Heading = (Target.position - transform.position).normalized;
+                Vector3 toPosition = transform.position + Heading * Speed * Time.deltaTime;
+                m_distanceTraveled += m_speed * Time.deltaTime;
+                MovePlane(toPosition);
+                if((Target.position - transform.position).magnitude < 0.05f)
+                {
+                    //Target Reached.
+                    m_lineRenderer.enabled = false;
+                    Target = null;
+                }
+
+                //Debug.Log("Draw Line");
+                if (m_lineRenderer)
+                {
+                    m_lineRenderer.enabled = true;
+                    m_lineRenderer.positionCount = 2;
+                    m_lineRenderer.SetPosition(0, transform.position);
+                    m_lineRenderer.SetPosition(1, Target.position);
+                }
+            }
+            else
+            {
+             
+                Vector3 toPosition = transform.position + Heading * Speed * Time.deltaTime;
+                m_distanceTraveled += m_speed * Time.deltaTime;
+                MovePlane(toPosition);
+            }
+        }
+        
+        /*
         if (m_state == PlaneState.OnTask || m_state == PlaneState.RTB)
         {
             transform.position += m_heading * m_speed * Time.deltaTime;
             m_distanceTraveled += m_speed * Time.deltaTime;
         }
+        */
 
+
+        //Out of Range fall
         if (m_distanceTraveled > m_range && m_state != PlaneState.Destroyed)
         {
             PlaneShotDown();
-
-
         }
+
+        //Draw line
+        /*
+        if(m_lineRenderer && m_target && State == PlaneState.OnTask)
+        {
+            //Draw line
+            Debug.Log("Draw Line");
+            m_lineRenderer.enabled = true;
+            m_lineRenderer.positionCount = 2;
+            m_lineRenderer.SetPosition(0, transform.position);
+            m_lineRenderer.SetPosition(1, Target.position);
+        }
+        */
     }
     public virtual void TakeOff()
     {
@@ -131,6 +212,10 @@ public abstract class Plane : MonoBehaviour
     public virtual void Land()
     {
         //Debug.Log("Plane landed");
+        if (m_lineRenderer)
+        {
+            m_lineRenderer.enabled = false;
+        }
         Assert.IsTrue(m_state == PlaneState.RTB || m_state == PlaneState.OnTask);
 
         m_startPrep = false;
@@ -144,6 +229,10 @@ public abstract class Plane : MonoBehaviour
 
     public virtual void PlaneShotDown()
     {
+        if (m_lineRenderer)
+        {
+            m_lineRenderer.enabled = false;
+        }
         m_state = PlaneState.Destroyed;
         m_spriteRenderer.color = Color.gray;
     }

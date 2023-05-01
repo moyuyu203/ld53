@@ -16,6 +16,7 @@ public class USAFCommand : Singleton<USAFCommand>
     public List<TransportCount> TransportInventory = new List<TransportCount>();
     private int m_planeIndex;
 
+    public int PlaneIndex { get { return m_planeIndex; } }
     public void SelectDeployment(int planeIndex)
     {
         Debug.Log("Selected Small plane");

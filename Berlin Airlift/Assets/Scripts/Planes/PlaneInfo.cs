@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlaneInfo : MonoBehaviour
 {
@@ -10,4 +11,6 @@ public class PlaneInfo : MonoBehaviour
     public string Speed;
     public string Range;
     public string Payload;
+
+    public Image PlaneImage;
 }

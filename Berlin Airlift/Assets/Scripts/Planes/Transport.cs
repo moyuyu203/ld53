@@ -15,7 +15,11 @@ public class Transport : Plane
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
-        Heading = (Berlin.Instance.transform.position - transform.position).normalized;
+        //Heading = (Berlin.Instance.transform.position - transform.position).normalized;
+        if(Target == null)
+        {
+            Target = Berlin.Instance.transform;
+        }
     }
 
     public override void TakeOff()
@@ -41,6 +45,7 @@ public class Transport : Plane
         {
             berlinAirField.SupplyBerlin(m_payload);
             Land();
+            gameObject.SetActive(false);
         }
     }
 }

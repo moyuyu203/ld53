@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class MouseInputManager : MonoBehaviour
 {
+    public IntelPanelUI IntelPanel;
     public RectTransform selectionBox;
     public Canvas canvas;
     public LayerMask selectableLayer;
     public Camera mainCamera;
-
+    public Waypoint waypoint;
 
     private Vector2 startPosition;
     private List<Plane> selectedUnits;
@@ -26,25 +27,39 @@ public class MouseInputManager : MonoBehaviour
     }
     void Update()
     {
+        if(Input.GetMouseButton(0) || Input.GetMouseButton(1))
+        {
+            IntelPanel.Hide();
+        }
+
+        /*
         if(Input.GetMouseButton(1))
         {
             Debug.Log("Cancel selection=");
             selectedUnits.Clear();
         }
-
-        if(HasSelectedUnits && Input.GetMouseButton(0))
+        */
+        if (Input.GetMouseButtonDown(1) && !m_selecting)
         {
-            HandleSelectedUnits();
+            StartSelection();
+        }
+        
+
+
+        if (HasSelectedUnits && Input.GetMouseButton(1))
+        {
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            HandleSelectedUnits(mousePos);
         }
         else if (m_selecting)
         {
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(1))
             {
                 UpdateSelectionBox(Input.mousePosition);
                 
             }
 
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonUp(1))
             {
                 m_selecting = false;
                 SelectObjectsInBounds();
@@ -71,14 +86,7 @@ public class MouseInputManager : MonoBehaviour
 
                 }
             }
-            else
-            {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    StartSelection();
-                }
-
-            }
+            
         }
     }
 
@@ -125,14 +133,25 @@ public class MouseInputManager : MonoBehaviour
             if (screenPoint.x >= min.x && screenPoint.x <= max.x && screenPoint.y >= min.y && screenPoint.y <= max.y)
             {
                 //selectedObjects.Add(collider.gameObject);
-                Debug.Log("Do Add unit");
+                //Debug.Log("Do Add unit");
+                Plane plane = collider.gameObject.GetComponent<Plane>();
+                if(plane && plane.Group == PlaneGroup.Nato && plane.State == PlaneState.OnTask)
+                {
+                    selectedUnits.Add(plane);
+                    Debug.Log("Do Add unit");
+                }
             }
         }
     }
 
-    void HandleSelectedUnits()
+    void HandleSelectedUnits(Vector3 mousePosition)
     {
         Debug.Log("Handle Selection");
+        Waypoint wp = Instantiate(waypoint, mousePosition, Quaternion.identity);
+        foreach(Plane plane in selectedUnits)
+        {
+            plane.Target = wp.transform;
+        }
         selectedUnits.Clear();
     }
 }

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class Berlin : Singleton<Berlin>
 {
     [SerializeField] private float m_totalSupplyNeeded;
@@ -15,7 +15,9 @@ public class Berlin : Singleton<Berlin>
         if(m_currSupply > m_totalSupplyNeeded)
         {
             Debug.Log("Win!");
-            Time.timeScale = 0;
+            //Time.timeScale = 0;
+            SceneManager.LoadScene("End");
+            
         }
     }
 }
