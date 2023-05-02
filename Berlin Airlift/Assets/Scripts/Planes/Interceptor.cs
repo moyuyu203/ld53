@@ -21,7 +21,14 @@ public class Interceptor : Plane
             State = PlaneState.RTB;
             OutOfFuel?.Invoke();
         }
+
+        if(State == PlaneState.RTB && Vector2.Distance(transform.position, m_homeBase.transform.position) < 0.1)
+        {
+            Debug.Log("Do interceptor landing");
+            Land();
+        }
         
+
     }
     public void MissionComplete()
     {
@@ -31,20 +38,9 @@ public class Interceptor : Plane
     public override void Land()
     {
         base.Land();
-        m_homeBase.LineUp(this);
+        //m_homeBase.LineUp(this);
     }
-    private void OnTriggerEnter2D(Collider2D collision)
-    { 
-        InterceptorBase airbase =  collision.GetComponent<InterceptorBase>();
-        if (airbase && State == PlaneState.RTB)
-        {
-            if(airbase.gameObject.GetInstanceID() == m_homeBase.gameObject.GetInstanceID())
-            {
-                Debug.Log("Do interceptor landing");
-                Land();
-            }
-        }
-    }
+    
 
 
 }

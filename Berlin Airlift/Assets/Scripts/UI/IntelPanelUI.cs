@@ -12,7 +12,7 @@ public class IntelPanelUI : MonoBehaviour
     private void Awake()
     {
         IntelField.AddRange(GetComponentsInChildren<TextMeshProUGUI>());
-        IntelImage = GetComponentInChildren<Image>();
+        IntelImage.preserveAspect = true;
     }
     public void Hide()
     {

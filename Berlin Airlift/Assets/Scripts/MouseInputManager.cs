@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MouseInputManager : MonoBehaviour
@@ -12,7 +14,7 @@ public class MouseInputManager : MonoBehaviour
     public Waypoint waypoint;
 
     private Vector2 startPosition;
-    private List<Plane> selectedUnits;
+    public List<Plane> selectedUnits;
 
 
     private Vector2 mousePos2D;
@@ -27,7 +29,7 @@ public class MouseInputManager : MonoBehaviour
     }
     void Update()
     {
-        if(Input.GetMouseButton(0) || Input.GetMouseButton(1))
+        if(Input.GetMouseButton(1))
         {
             IntelPanel.Hide();
         }
@@ -72,9 +74,11 @@ public class MouseInputManager : MonoBehaviour
             mousePos2D = new Vector2(mousePos.x, mousePos.y);
             RaycastHit2D hit = Physics2D.Raycast(mousePos2D, Vector2.zero);
 
+            
             if (hit)
             {
-                IMouseInput mouseInput = hit.collider.gameObject.GetComponent<IMouseInput>();
+                IMouseInput[] mouseInputs = hit.collider.gameObject.GetComponents<IMouseInput>();
+                /*
                 if (mouseInput != null)
                 {
                     mouseInput.MouseHover();
@@ -82,10 +86,22 @@ public class MouseInputManager : MonoBehaviour
                     {
                         mouseInput.MouseClick();
                     }
-
-
                 }
+                */
+                foreach(IMouseInput mouseInput in mouseInputs)
+                {
+                    mouseInput.MouseHover();
+                }
+                if (mouseInputs.Length > 0 && Input.GetMouseButtonDown(0))
+                {
+                    mouseInputs[0].MouseClick();
+                }
+
+
             }
+            
+
+           
             
         }
     }

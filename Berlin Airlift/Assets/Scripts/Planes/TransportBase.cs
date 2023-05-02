@@ -23,6 +23,10 @@ public class TransportBase : Airbase, IMouseInput
         {
             OrderTakeoff();
         }
+        if(m_currTakeoffPlane && (m_currTakeoffPlane.gameObject.activeInHierarchy == false || m_currTakeoffPlane.State == PlaneState.Destroyed))
+        {
+            m_currTakeoffPlane = null;
+        }
     }
     private void TryDeployment()
     {
@@ -34,6 +38,7 @@ public class TransportBase : Airbase, IMouseInput
             //plane.TakeOff();
             //m_takeoffQueue.Add(plane);
             //OrderTakeoff();
+            plane.SetHomeBase(this);
             LineUp(plane);
 
         }

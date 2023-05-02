@@ -12,5 +12,5 @@ public class PlaneInfo : MonoBehaviour
     public string Range;
     public string Payload;
 
-    public Image PlaneImage;
+    public Sprite PlaneImage;
 }

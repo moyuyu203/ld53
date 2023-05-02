@@ -144,7 +144,7 @@ public abstract class Plane : MonoBehaviour
                 Vector3 toPosition = transform.position + Heading * Speed * Time.deltaTime;
                 m_distanceTraveled += m_speed * Time.deltaTime;
                 MovePlane(toPosition);
-                if((Target.position - transform.position).magnitude < 0.05f)
+                if(Vector2.Distance(m_target.position, transform.position) < 0.05f)
                 {
                     //Target Reached.
                     m_lineRenderer.enabled = false;
@@ -152,7 +152,7 @@ public abstract class Plane : MonoBehaviour
                 }
 
                 //Debug.Log("Draw Line");
-                if (m_lineRenderer)
+                if (m_lineRenderer && m_target)
                 {
                     m_lineRenderer.enabled = true;
                     m_lineRenderer.positionCount = 2;
@@ -224,7 +224,7 @@ public abstract class Plane : MonoBehaviour
         m_distanceTraveled = 0;
         m_remainPrepTime = m_preparationTime;
         //this.gameObject.SetActive(false);
-        //m_homeBase.LineUp(this);
+        m_homeBase.LineUp(this);
     }
 
     public virtual void PlaneShotDown()

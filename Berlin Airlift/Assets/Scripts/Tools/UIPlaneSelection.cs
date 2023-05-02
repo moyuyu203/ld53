@@ -50,6 +50,9 @@ public class UIPlaneSelection : Singleton<UIPlaneSelection>
             intelButton.onClick.AddListener(() => ShowIntel(intel, planeIndex));
             panelHolder.intel = intelButton;
 
+            Image planeImage = planeUISlot.transform.Find("PlaneImage").GetComponent<Image>();
+            planeImage.preserveAspect = true;
+            planeImage.sprite = intel.PlaneImage;
 
             m_planeUISlots.Add(panelHolder);
 
@@ -90,11 +93,14 @@ public class UIPlaneSelection : Singleton<UIPlaneSelection>
             IntelPanel.gameObject.SetActive(true);
             //TextMeshProUGUI nameSlot = IntelPanel.transform.Find("Name").GetComponent<TextMeshProUGUI>();
             //nameSlot.text = intel.name;
-            IntelPanel.IntelField[0].text = "Name  : " + intel.name;
-            IntelPanel.IntelField[1].text = "Speed : "  + intel.Speed;
-            IntelPanel.IntelField[2].text = "Range : " + intel.Range;
-            IntelPanel.IntelField[3].text = "Payload : " + intel.Payload;
-            IntelPanel.IntelField[4].text = "Number Remain: " + USAFCommand.Instance.TransportInventory[intelIndex].count.ToString();
+            IntelPanel.IntelField[0].text = "" + intel.Name;
+            IntelPanel.IntelField[1].text = "Transport";
+            IntelPanel.IntelField[2].text = "Speed : "  + intel.Speed;
+            IntelPanel.IntelField[3].text = "Range : " + intel.Range;
+            IntelPanel.IntelField[4].text = "Payload : " + intel.Payload;
+            IntelPanel.IntelField[5].text = "Number Remain: " + USAFCommand.Instance.TransportInventory[intelIndex].count.ToString();
+
+            IntelPanel.IntelImage.sprite = intel.PlaneImage;
         }
 
     }

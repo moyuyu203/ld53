@@ -46,6 +46,7 @@ public class SovietCommand : Singleton<SovietCommand>
             m_interceptor = null;
         }
     }
+    public IntelPanelUI IntelPanel;
 
     private List<PlaneTarget> m_targetList = new List<PlaneTarget>();
     private List<InterceptorBase> m_bases = new List<InterceptorBase>();

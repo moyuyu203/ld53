@@ -78,7 +78,7 @@ SpriteRenderer:
   m_SortingLayerID: 876236183
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
+  m_Sprite: {fileID: -2135585597343286014, guid: 4b2a04fdbe0ef4d8da8f90eaca817cd1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -117,8 +117,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99a0d4cee52d1f640808785697400cc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_preparationTime: 15
-  m_speed: 0.15
+  m_preparationTime: 7
+  m_speed: 0.45
   m_range: 60
   m_payload: 50
 --- !u!50 &8013071839661346556
@@ -254,9 +254,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Group: 0
-  Name: Large Transport
+  Name: Douglas C-54 Skymaster
   Description: 
-  Speed: 0.15
-  Range: 60
+  Speed: 45
+  Range: 6000
   Payload: 50
-  PlaneImage: {fileID: 0}
+  PlaneImage: {fileID: 21300000, guid: e1f8cb5041be5d44abb702e6c9c2c18d, type: 3}

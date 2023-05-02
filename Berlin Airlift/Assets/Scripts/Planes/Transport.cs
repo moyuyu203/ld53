@@ -30,14 +30,19 @@ public class Transport : Plane
         Debug.Log("Transport plane takes off");
     }
 
+    public void OrderRetreat()
+    {
+        State = PlaneState.RTB;
+    }
     protected void OnTriggerEnter2D(Collider2D collision)
     {
         Plane otherPlane = collision.gameObject.GetComponent<Plane>();
         if (otherPlane)
         {
-            if (otherPlane.Group == PlaneGroup.WarsawPact && this.m_group == PlaneGroup.Nato && State != PlaneState.Destroyed)
+            if (otherPlane.Group == PlaneGroup.WarsawPact && this.m_group == PlaneGroup.Nato && State != PlaneState.Destroyed && otherPlane.State == PlaneState.OnTask)
             {
-                PlaneShotDown();
+                //PlaneShotDown();
+                OrderRetreat();
             }
         }
         Berlin berlinAirField = collision.gameObject.GetComponent<Berlin>();
@@ -46,6 +51,14 @@ public class Transport : Plane
             berlinAirField.SupplyBerlin(m_payload);
             Land();
             gameObject.SetActive(false);
+        }
+        if (State == PlaneState.RTB)
+        {
+            TransportBase alliesBase = collision.gameObject.GetComponent<TransportBase>();
+            if (alliesBase)
+            {
+                Land();
+            }
         }
     }
 }
